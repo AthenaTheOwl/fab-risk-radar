@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "node_id": "frr-node-abf-ibiden-ogaki",
+      "name": "Ibiden Ogaki ABF substrate cluster",
+      "tier": 2,
+      "node_kind": "abf-substrate",
+      "region": "Japan"
+    },
+    {
+      "node_id": "frr-node-abf-unimicron-taoyuan",
+      "name": "Unimicron Taoyuan substrate cluster",
+      "tier": 2,
+      "node_kind": "abf-substrate",
+      "region": "Taiwan"
+    },
+    {
+      "node_id": "frr-node-osat-ase-kaohsiung",
+      "name": "ASE Kaohsiung advanced packaging",
+      "tier": 2,
+      "node_kind": "advanced-packaging-osat",
+      "region": "Taiwan"
+    }
+  ],
+  "edges": [
+    {
+      "source": "frr-node-abf-ibiden-ogaki",
+      "target": "frr-node-osat-ase-kaohsiung",
+      "flow_kind": "material"
+    },
+    {
+      "source": "frr-node-abf-unimicron-taoyuan",
+      "target": "frr-node-osat-ase-kaohsiung",
+      "flow_kind": "material"
+    }
+  ]
+}
+

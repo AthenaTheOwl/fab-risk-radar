@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://athena.dev/frr/evidence-item.schema.json",
+  "title": "FabRiskRADAR evidence item",
+  "type": "object",
+  "required": ["evidence_id", "node_id", "source_kind", "source_url", "extracted_on", "claim"],
+  "additionalProperties": false,
+  "properties": {
+    "evidence_id": {"type": "string"},
+    "node_id": {"type": "string"},
+    "source_kind": {
+      "type": "string",
+      "enum": ["filing", "news", "trade-data", "imagery", "manual"]
+    },
+    "source_url": {"type": "string", "format": "uri"},
+    "extracted_on": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "claim": {"type": "string", "minLength": 20}
+  }
+}
+

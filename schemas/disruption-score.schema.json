@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://athena.dev/frr/disruption-score.schema.json",
+  "title": "FabRiskRADAR disruption score",
+  "type": "object",
+  "required": [
+    "node_id",
+    "node_name",
+    "node_kind",
+    "region",
+    "slice",
+    "as_of",
+    "horizon_days",
+    "disruption_probability_90d",
+    "risk_band",
+    "evidence_ids"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "node_id": {"type": "string"},
+    "node_name": {"type": "string"},
+    "node_kind": {"type": "string"},
+    "region": {"type": "string"},
+    "slice": {"type": "string"},
+    "as_of": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "horizon_days": {"type": "integer", "const": 90},
+    "disruption_probability_90d": {"type": "number", "minimum": 0, "maximum": 1},
+    "risk_band": {"type": "string", "enum": ["low", "watch", "high"]},
+    "evidence_ids": {"type": "array", "minItems": 3, "items": {"type": "string"}}
+  }
+}
+

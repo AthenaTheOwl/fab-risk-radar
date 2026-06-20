@@ -1,0 +1,10 @@
+evidence_id,node_id,source_kind,source_url,extracted_on,claim
+ev-abf-ibiden-001,frr-node-abf-ibiden-ogaki,filing,https://www.ibiden.com/ir/library/,2026-06-20,"Management materials continue to call out IC package substrate demand and capacity investment."
+ev-abf-ibiden-002,frr-node-abf-ibiden-ogaki,trade-data,https://www.meti.go.jp/english/statistics/,2026-06-20,"Japan electronics-materials trade data is a monitoring input for substrate bottlenecks."
+ev-abf-ibiden-003,frr-node-abf-ibiden-ogaki,manual,https://www.semiconductors.org/strengthening-the-global-semiconductor-supply-chain-in-an-uncertain-era/,2026-06-20,"Industry supply-chain mapping treats advanced substrates as a packaging constraint."
+ev-abf-unimicron-001,frr-node-abf-unimicron-taoyuan,filing,https://www.unimicron.com/investors/financial-reports/,2026-06-20,"Investor materials report substrate demand as a main business driver."
+ev-abf-unimicron-002,frr-node-abf-unimicron-taoyuan,news,https://www.tsmc.com/english/dedicatedFoundry/technology/3DFabric,2026-06-20,"Advanced packaging demand raises dependency on substrate and package assembly inputs."
+ev-abf-unimicron-003,frr-node-abf-unimicron-taoyuan,manual,https://www.semiconductors.org/strengthening-the-global-semiconductor-supply-chain-in-an-uncertain-era/,2026-06-20,"Substrate concentration remains a supply-chain monitoring point."
+ev-osat-ase-001,frr-node-osat-ase-kaohsiung,filing,https://www.aseglobal.com/investor-relations/financial-information,2026-06-20,"ASE filings are the public anchor for advanced-packaging capacity monitoring."
+ev-osat-ase-002,frr-node-osat-ase-kaohsiung,news,https://www.tsmc.com/english/dedicatedFoundry/technology/3DFabric,2026-06-20,"3D packaging demand increases load on OSAT and package-test capacity."
+ev-osat-ase-003,frr-node-osat-ase-kaohsiung,manual,https://www.semiconductors.org/strengthening-the-global-semiconductor-supply-chain-in-an-uncertain-era/,2026-06-20,"Packaging capacity is a named semiconductor supply-chain constraint."
