@@ -47,6 +47,22 @@ def test_cli_builds_report_and_jsonl() -> None:
     validate_traceability(score_path, ROOT / "data" / "evidence" / "2026-06-substrate-osat.jsonl")
 
 
+def test_cli_show_prints_ranked_summary() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "frr", "show"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    out = result.stdout
+    assert "90-day disruption screen" in out
+    assert "Ibiden Ogaki ABF substrate cluster" in out
+    assert "top risk:" in out
+    # ranked highest-probability node appears before lowest
+    assert out.index("Ibiden Ogaki") < out.index("ASE Kaohsiung")
+
+
 def test_report_rows_are_json_objects() -> None:
     rows = read_jsonl(ROOT / "data" / "scores" / "substrate-osat" / "2026-06.jsonl")
     assert rows

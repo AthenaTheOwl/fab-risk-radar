@@ -32,18 +32,34 @@ Bucket: supply-chain. Category: supply-chain. Brand prefix: `FRR`.
 
 v0.1 shipped and runs end to end. The entry command `python frr.py validate` runs. See `specs/0002-design/` for the v0.1 scope and `STATUS.md` (where present) for the current state and next-feature queue.
 
+## try it
+
+No args, read-only, offline. Prints the committed 2026-06 ranked screen:
+
+```
+$ python frr.py show
+FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
+3 nodes scored, 2 in the high band. Higher probability = more likely to constrain capacity in the next 90 days.
+
+  rank   prob  band   node
+  1     0.580  high   Ibiden Ogaki ABF substrate cluster (Japan)
+  2     0.550  high   Unimicron Taoyuan substrate cluster (Taiwan)
+  3     0.510  watch  ASE Kaohsiung advanced packaging (Taiwan)
+
+top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption probability
+```
+
+It tells a procurement lead which substrate/OSAT node to chase first this quarter, ranked, with each score backed by three public evidence items.
+
 ## How to run
 
-Placeholder. Run commands will land in spec `0002-substrate-osat`.
-The shape will be:
-
 ```powershell
-uv sync
-uv run frr import graph ../chip-supply-chain-map/exports/2026-08.json
-uv run frr score --slice substrate-osat --as-of 2026-09-01
-uv run frr render report --month 2026-09
-uv run frr calibration --backtest 2024-2025
+python frr.py show                                  # ranked screen from committed data
+python frr.py score --slice substrate-osat --month 2026-06   # rebuild scores + report
+python frr.py validate                              # check score-to-evidence traceability
 ```
+
+Full prose report: `reports/2026-06-substrate-osat.md`.
 
 ## Layout
 

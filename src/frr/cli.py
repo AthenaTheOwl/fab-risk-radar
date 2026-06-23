@@ -6,9 +6,9 @@ from pathlib import Path
 
 from .evidence import evidence_by_node, load_evidence
 from .graph import load_graph, select_slice
-from .report import render_markdown, write_jsonl
+from .report import render_markdown, render_summary, write_jsonl
 from .scoring import score_nodes
-from .validation import validate_traceability
+from .validation import read_jsonl, validate_traceability
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -37,6 +37,14 @@ def validate_reports() -> None:
         validate_traceability(score_path, evidence_path)
 
 
+def show_summary(slice_name: str = "substrate-osat", month: str = "2026-06") -> str:
+    score_path = ROOT / "data" / "scores" / slice_name / f"{month}.jsonl"
+    evidence_path = ROOT / "data" / "evidence" / f"{month}-{slice_name}.jsonl"
+    scores = read_jsonl(score_path)
+    evidence = read_jsonl(evidence_path)
+    return render_summary(scores, evidence)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="frr")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -44,7 +52,13 @@ def main(argv: list[str] | None = None) -> int:
     score.add_argument("--slice", default="substrate-osat")
     score.add_argument("--month", default="2026-06")
     sub.add_parser("validate")
+    show = sub.add_parser("show", help="print the committed ranked disruption screen")
+    show.add_argument("--slice", default="substrate-osat")
+    show.add_argument("--month", default="2026-06")
     args = parser.parse_args(argv)
+    if args.command == "show":
+        print(show_summary(args.slice, args.month))
+        return 0
     if args.command == "score":
         score_path, report_path = build_report(args.month, args.slice)
         print(

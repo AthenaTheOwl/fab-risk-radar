@@ -13,6 +13,46 @@ def write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
             handle.write(json.dumps(row, sort_keys=True) + "\n")
 
 
+def render_summary(scores: list[dict[str, object]], evidence: list[dict[str, object]]) -> str:
+    """Build a ranked, human-readable summary from committed score + evidence rows."""
+    evidence_by_id = {str(item["evidence_id"]): item for item in evidence}
+    ranked = sorted(
+        scores,
+        key=lambda row: float(row["disruption_probability_90d"]),
+        reverse=True,
+    )
+    as_of = str(ranked[0]["as_of"]) if ranked else "?"
+    slice_name = str(ranked[0]["slice"]) if ranked else "?"
+    high = [r for r in ranked if str(r["risk_band"]) == "high"]
+
+    lines = [
+        f"FabRiskRADAR - {slice_name} - 90-day disruption screen (as of {as_of})",
+        f"{len(ranked)} nodes scored, {len(high)} in the high band. "
+        "Higher probability = more likely to constrain capacity in the next 90 days.",
+        "",
+        f"  {'rank':<4} {'prob':>6}  {'band':<6} node",
+        f"  {'-' * 4} {'-' * 6}  {'-' * 6} {'-' * 40}",
+    ]
+    for index, row in enumerate(ranked, start=1):
+        prob = float(row["disruption_probability_90d"])
+        band = str(row["risk_band"])
+        name = str(row["node_name"])
+        region = str(row["region"])
+        lines.append(f"  {index:<4} {prob:>6.3f}  {band:<6} {name} ({region})")
+
+    if ranked:
+        top = ranked[0]
+        first_id = list(top["evidence_ids"])[0]
+        anchor = evidence_by_id.get(str(first_id))
+        lines.append("")
+        lines.append(f"top risk: {top['node_name']} ({top['region']}) at "
+                     f"{float(top['disruption_probability_90d']):.0%} 90-day disruption probability")
+        if anchor is not None:
+            lines.append(f"  anchored on {anchor['source_kind']}: {anchor['source_url']}")
+
+    return "\n".join(lines)
+
+
 def render_markdown(path: Path, scores: list[ScoreRow], evidence: list[EvidenceItem]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     evidence_by_id = {item.evidence_id: item for item in evidence}
