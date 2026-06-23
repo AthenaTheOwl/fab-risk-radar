@@ -29,9 +29,8 @@ Bucket: supply-chain. Category: supply-chain. Brand prefix: `FRR`.
 
 ## Status
 
-v0 scaffold. No implementation yet. The first PR after the scaffold
-imports the chip-supply-chain-map graph export and lands the
-disruption-probability schema; see `docs/first-pr.md`.
+
+v0.1 shipped and runs end to end. The entry command `python frr.py validate` runs. See `specs/0002-design/` for the v0.1 scope and `STATUS.md` (where present) for the current state and next-feature queue.
 
 ## How to run
 
