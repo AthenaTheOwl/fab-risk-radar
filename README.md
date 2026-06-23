@@ -61,6 +61,24 @@ python frr.py validate                              # check score-to-evidence tr
 
 Full prose report: `reports/2026-06-substrate-osat.md`.
 
+## live demo
+
+interactive web view of the same ranked screen `python frr.py show` prints,
+reading the committed `data/scores/` + `data/evidence/` artifacts directly.
+
+local:
+
+```
+pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+deploy: Streamlit Community Cloud -> New app -> repo `AthenaTheOwl/fab-risk-radar`,
+branch `main`, main file `streamlit_app.py`.
+
+<!-- live URL: https://<app>.streamlit.app -->
+
+
 ## Layout
 
 ```
