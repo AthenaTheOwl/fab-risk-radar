@@ -11,6 +11,7 @@ branch main, main file streamlit_app.py.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import streamlit as st
@@ -18,6 +19,18 @@ import streamlit as st
 REPO = Path(__file__).resolve().parent
 SCORES_DIR = REPO / "data" / "scores"
 EVIDENCE_DIR = REPO / "data" / "evidence"
+
+# make the real package importable on Streamlit Cloud (src/ layout)
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from src.frr.models import EvidenceItem  # noqa: E402
+from src.frr.scoring import (  # noqa: E402
+    NODE_BASE,
+    SOURCE_WEIGHTS,
+    risk_band,
+    score_node,
+)
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -115,8 +128,108 @@ with st.expander("evidence for the top-risk node"):
             f"  source: {item.get('source_url')}"
         )
 
+st.divider()
+st.header("score a node yourself")
+st.caption(
+    "this drives the real engine — `src/frr/scoring.py:score_node` — not a lookup. "
+    "set the node kind, tier, and the public evidence you have; the same function "
+    "the monthly screen uses recomputes the 90-day disruption probability live."
+)
+
+kinds = list(NODE_BASE)
+source_kinds = list(SOURCE_WEIGHTS)
+
+ic1, ic2 = st.columns(2)
+with ic1:
+    pick_kind = st.selectbox(
+        "node kind",
+        kinds,
+        help="abf-substrate carries a higher base than advanced-packaging-osat",
+    )
+    pick_tier = st.slider(
+        "tier",
+        min_value=1,
+        max_value=4,
+        value=2,
+        help="lower tier (closer to 1) adds more probability — bigger upstream chokepoint",
+    )
+with ic2:
+    st.markdown("**evidence you've gathered** (need at least 3; first 5 count)")
+    chosen: list[str] = []
+    for i in range(5):
+        default = source_kinds[i % len(source_kinds)] if i < 3 else "(none)"
+        sel = st.selectbox(
+            f"evidence #{i + 1} source kind",
+            ["(none)"] + source_kinds,
+            index=(["(none)"] + source_kinds).index(default),
+            key=f"ev_kind_{i}",
+        )
+        if sel != "(none)":
+            chosen.append(sel)
+
+if len(chosen) < 3:
+    st.warning(
+        f"the engine requires at least 3 evidence items — you have {len(chosen)}. "
+        "add more to score."
+    )
+else:
+    node = {
+        "node_id": "frr-node-user",
+        "name": "your node",
+        "node_kind": pick_kind,
+        "region": "user-supplied",
+        "tier": pick_tier,
+    }
+    user_evidence = [
+        EvidenceItem(
+            evidence_id=f"user-ev-{i}",
+            node_id="frr-node-user",
+            source_kind=kind,
+            source_url="user-supplied",
+            extracted_on=as_of,
+            claim="user-supplied",
+        )
+        for i, kind in enumerate(chosen)
+    ]
+    row = score_node(node, user_evidence, as_of)
+
+    band_color = {"high": "🔴", "watch": "🟠", "low": "🟢"}.get(row.risk_band, "")
+    rc1, rc2 = st.columns(2)
+    rc1.metric(
+        "90-day disruption probability",
+        f"{row.disruption_probability_90d:.0%}",
+    )
+    rc2.metric("risk band", f"{band_color} {row.risk_band}")
+
+    base = NODE_BASE.get(pick_kind, 0.20)
+    source_score = sum(SOURCE_WEIGHTS.get(k, 0.02) for k in chosen[:5])
+    tier_score = max(0.0, (4 - int(pick_tier)) * 0.03)
+    st.markdown("**why** (the additive terms `score_node` summed, capped at 0.85):")
+    st.dataframe(
+        [
+            {"term": f"base ({pick_kind})", "contribution": round(base, 3)},
+            {
+                "term": f"evidence ({', '.join(chosen[:5])})",
+                "contribution": round(source_score, 3),
+            },
+            {"term": f"tier {pick_tier} bonus", "contribution": round(tier_score, 3)},
+            {
+                "term": "= probability (min(0.85, sum))",
+                "contribution": row.disruption_probability_90d,
+            },
+        ],
+        use_container_width=True,
+        hide_index=True,
+    )
+    bands_ladder = "low < 0.35 ≤ watch < 0.55 ≤ high"
+    st.caption(
+        f"`risk_band({row.disruption_probability_90d}) = {risk_band(row.disruption_probability_90d)}`"
+        f" — ladder: {bands_ladder}"
+    )
+
 st.caption(
     "v0.1 ships one substrate-osat fixture month. scoring lives in `src/frr/`; "
-    "this page reads the committed `data/scores/` + `data/evidence/` artifacts. "
+    "this page reads the committed `data/scores/` + `data/evidence/` artifacts and "
+    "drives `src/frr/scoring.py` live in the section above. "
     "repo: github.com/AthenaTheOwl/fab-risk-radar"
 )
