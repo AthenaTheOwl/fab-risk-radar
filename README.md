@@ -1,38 +1,24 @@
-# FabRiskRADAR
+# fab-risk-radar
 
-Monthly published report on tier-2 and tier-3 semiconductor disruption
-risk. Substrate (ABF) and OSAT focus. Calibrated 90-day disruption
-probability scores with three evidence items behind each score.
+A single substrate cluster in Ogaki, Japan carries a 58% chance of disrupting supply
+in the next 90 days. Three other names sit behind it. fab-risk-radar publishes the
+list, ranked, with the public filing behind each number.
 
-## What this is
+## What it does
 
-The semis supply chain has a tier-N problem. Resilinc and Everstream
-cover tier-1 with rigor; below that, the substrate, OSAT, and packaging
-nodes that actually constrain 2026-2027 capacity sit in a gap. The
-next squeeze after CoWoS is Ajinomoto ABF substrate plus advanced
-packaging OSATs. Board-level questions about Taiwan and Korea trade
-scenarios get answered with vibes because nobody publishes the graph.
+The semiconductor supply chain is watched closely at tier-1 and goes dark below it.
+The substrate, OSAT, and packaging nodes that actually cap 2026-2027 capacity sit in
+that dark. After CoWoS, the next squeeze is Ajinomoto ABF substrate and the advanced-
+packaging OSATs, and the questions about Taiwan and Korea trade scenarios get answered
+with a shrug because nobody publishes the graph.
 
-FabRiskRADAR is the report. Monthly cadence. Top 20 tier-2/3 semis
-nodes by disruption probability over the next 90 days. Three evidence
-items per score, each with a public source. The first issue covers
-ABF substrate plus advanced packaging OSATs.
+fab-risk-radar publishes the graph. Each month it scores the top tier-2/3 nodes by
+how likely they are to disrupt supply in the next 90 days, bands them high/watch, and
+hangs three public evidence items off every score so the number is something you can
+check instead of trust. The first issue covers ABF substrate plus advanced-packaging
+OSATs.
 
-Bucket: supply-chain. Category: supply-chain. Brand prefix: `FRR`.
-
-## Who this is for
-
-- Procurement and resilience leads at fabless semis design groups
-  (AMD, Marvell, Broadcom, Apple SPG).
-- Industrial OEMs that buy chips (auto Tier-1s, medical devices).
-- Defense primes with semis exposure.
-
-## Status
-
-
-v0.1 shipped and runs end to end. The entry command `python frr.py validate` runs. See `specs/0002-design/` for the v0.1 scope and `STATUS.md` (where present) for the current state and next-feature queue.
-
-## try it
+## Try it
 
 No args, read-only, offline. Prints the committed 2026-06 ranked screen:
 
@@ -42,29 +28,22 @@ FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
 3 nodes scored, 2 in the high band. Higher probability = more likely to constrain capacity in the next 90 days.
 
   rank   prob  band   node
+  ---- ------  ------ ----------------------------------------
   1     0.580  high   Ibiden Ogaki ABF substrate cluster (Japan)
   2     0.550  high   Unimicron Taoyuan substrate cluster (Taiwan)
   3     0.510  watch  ASE Kaohsiung advanced packaging (Taiwan)
 
 top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption probability
+  anchored on filing: https://www.ibiden.com/ir/library/
 ```
 
-It tells a procurement lead which substrate/OSAT node to chase first this quarter, ranked, with each score backed by three public evidence items.
+It tells a procurement lead which substrate/OSAT node to chase first this quarter,
+ranked, with each score backed by three public evidence items.
 
-## How to run
+## Live demo
 
-```powershell
-python frr.py show                                  # ranked screen from committed data
-python frr.py score --slice substrate-osat --month 2026-06   # rebuild scores + report
-python frr.py validate                              # check score-to-evidence traceability
-```
-
-Full prose report: `reports/2026-06-substrate-osat.md`.
-
-## live demo
-
-interactive web view of the same ranked screen `python frr.py show` prints,
-reading the committed `data/scores/` + `data/evidence/` artifacts directly.
+An interactive web view of the same ranked screen `python frr.py show` prints, reading
+the committed `data/scores/` + `data/evidence/` artifacts directly.
 
 local:
 
@@ -78,6 +57,26 @@ branch `main`, main file `streamlit_app.py`.
 
 <!-- live URL: https://<app>.streamlit.app -->
 
+## How to run
+
+```powershell
+python frr.py show                                  # ranked screen from committed data
+python frr.py score --slice substrate-osat --month 2026-06   # rebuild scores + report
+python frr.py validate                              # check score-to-evidence traceability
+```
+
+Full prose report: `reports/2026-06-substrate-osat.md`.
+
+## How it connects
+
+The node set under all of these is one graph; fab-risk-radar scores the risk on it.
+
+- [chip-supply-chain-map](https://github.com/AthenaTheOwl/chip-supply-chain-map) — the
+  underlying graph this repo consumes as an export.
+- [wafer-to-watt](https://github.com/AthenaTheOwl/wafer-to-watt) — cross-references
+  accelerator commitments against the same nodes.
+- [multitier-psi](https://github.com/AthenaTheOwl/multitier-psi) — runs sealed
+  cross-OEM intersection queries over the same graph schema.
 
 ## Layout
 
@@ -105,16 +104,6 @@ fab-risk-radar/
   eval/                 # score_calibration.py, Brier backtest
   decisions/            # DEC-FRR-* architectural choices
 ```
-
-## Compounds with
-
-- `chip-supply-chain-map` is the underlying graph; this repo consumes
-  its export.
-- WaferToWatt cross-references accelerator commitments against the
-  same node set.
-- DemandStorm shares the HTS-code infrastructure.
-- MultiTier PSI uses the same graph schema for sealed cross-OEM
-  intersection queries.
 
 ## License
 
