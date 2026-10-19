@@ -10,5 +10,4 @@ The existing report renderer describes the v0.1 rubric as a deterministic screen
 
 ## References
 
-- https://github.com/3orionkings/ai-product-team/blob/main/workflows/process-change.md
 - https://scikit-learn.org/stable/modules/calibration.html
