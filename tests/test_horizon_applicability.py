@@ -52,8 +52,9 @@ def _show(*args):
 @pytest.mark.parametrize(
     "evaluated_on, expected",
     [
-        ("2026-07-15", "Applicability on 2026-07-15: 0/3"),
-        ("2026-09-28", "Applicability on 2026-09-28: 3/3"),
+        ("2026-06-29", "2026-06-29: 0/3 row(s) historical (horizon elapsed), 3/3 not started"),
+        ("2026-07-15", "2026-07-15: 0/3 row(s) historical (horizon elapsed).\n"),
+        ("2026-09-28", "2026-09-28: 3/3 row(s) historical (horizon elapsed).\n"),
     ],
 )
 def test_show_pins_evaluation_date(evaluated_on, expected):

@@ -42,15 +42,22 @@ def render_summary(
     slice_name = str(ranked[0]["slice"]) if ranked else "?"
     high = [r for r in ranked if str(r["risk_band"]) == "high"]
     evaluated_on = evaluated_on or date.today()
-    historical = sum(horizon_status(row, evaluated_on) == "historical" for row in ranked)
+    statuses = [horizon_status(row, evaluated_on) for row in ranked]
+    historical = statuses.count("historical")
+    not_started = statuses.count("not_started")
+    applicability = (
+        f"Applicability on {evaluated_on}: {historical}/{len(ranked)} row(s) historical "
+        "(horizon elapsed)"
+    )
+    if not_started:
+        applicability += f", {not_started}/{len(ranked)} not started (before as_of)"
 
     lines = [
         f"FabRiskRADAR - {slice_name} - 90-day disruption screen (as of {as_of})",
         f"{len(ranked)} nodes scored, {len(high)} in the high band. "
         "Scores describe the window anchored at as_of; "
         "fixture rubric values are not calibrated live forecasts.",
-        f"Applicability on {evaluated_on}: {historical}/{len(ranked)} row(s) historical "
-        "(horizon elapsed).",
+        f"{applicability}.",
         "",
         f"  {'rank':<4} {'prob':>6}  {'band':<6} node",
         f"  {'-' * 4} {'-' * 6}  {'-' * 6} {'-' * 40}",
