@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -64,7 +65,11 @@ def show_summary(
 
 
 def _iso_date(value: str) -> date:
+    # date.fromisoformat also takes 20261019 and 2026-W43-1; hold input to the
+    # documented YYYY-MM-DD form.
     try:
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+            raise ValueError
         return date.fromisoformat(value)
     except ValueError:
         raise argparse.ArgumentTypeError(f"expected YYYY-MM-DD, got {value!r}") from None

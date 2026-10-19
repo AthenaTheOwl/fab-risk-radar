@@ -63,7 +63,8 @@ def test_show_pins_evaluation_date(evaluated_on, expected):
     assert expected in result.stdout
 
 
-def test_show_rejects_malformed_evaluation_date():
-    result = _show("--evaluated-on", "2026-13-01")
+@pytest.mark.parametrize("value", ["2026-13-01", "20261019", "2026-W43-1", "2026-6-30"])
+def test_show_rejects_malformed_evaluation_date(value):
+    result = _show("--evaluated-on", value)
     assert result.returncode == 2
     assert "expected YYYY-MM-DD" in result.stderr
