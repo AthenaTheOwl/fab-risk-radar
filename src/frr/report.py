@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import date, timedelta
 from pathlib import Path
 
 from .models import EvidenceItem, ScoreRow
@@ -13,7 +14,23 @@ def write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
             handle.write(json.dumps(row, sort_keys=True) + "\n")
 
 
-def render_summary(scores: list[dict[str, object]], evidence: list[dict[str, object]]) -> str:
+def horizon_status(row: dict[str, object], evaluated_on: date) -> str:
+    """Classify applicability without changing a historical screen's values."""
+    start = date.fromisoformat(str(row["as_of"]))
+    horizon = row["horizon_days"]
+    if not isinstance(horizon, int) or isinstance(horizon, bool) or horizon <= 0:
+        raise ValueError("horizon_days must be a positive integer")
+    if evaluated_on < start:
+        return "not_started"
+    return "historical" if evaluated_on >= start + timedelta(days=horizon) else "within_window"
+
+
+def render_summary(
+    scores: list[dict[str, object]],
+    evidence: list[dict[str, object]],
+    *,
+    evaluated_on: date | None = None,
+) -> str:
     """Build a ranked, human-readable summary from committed score + evidence rows."""
     evidence_by_id = {str(item["evidence_id"]): item for item in evidence}
     ranked = sorted(
@@ -24,11 +41,14 @@ def render_summary(scores: list[dict[str, object]], evidence: list[dict[str, obj
     as_of = str(ranked[0]["as_of"]) if ranked else "?"
     slice_name = str(ranked[0]["slice"]) if ranked else "?"
     high = [r for r in ranked if str(r["risk_band"]) == "high"]
+    evaluated_on = evaluated_on or date.today()
+    historical = sum(horizon_status(row, evaluated_on) == "historical" for row in ranked)
 
     lines = [
         f"FabRiskRADAR - {slice_name} - 90-day disruption screen (as of {as_of})",
         f"{len(ranked)} nodes scored, {len(high)} in the high band. "
-        "Higher probability = more likely to constrain capacity in the next 90 days.",
+        "Scores describe the window anchored at as_of; fixture rubric values are not calibrated live forecasts.",
+        f"Applicability on {evaluated_on}: {historical}/{len(ranked)} row(s) historical (horizon elapsed).",
         "",
         f"  {'rank':<4} {'prob':>6}  {'band':<6} node",
         f"  {'-' * 4} {'-' * 6}  {'-' * 6} {'-' * 40}",

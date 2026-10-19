@@ -11,6 +11,7 @@ branch main, main file streamlit_app.py.
 from __future__ import annotations
 
 import json
+from datetime import date
 import sys
 from pathlib import Path
 
@@ -25,6 +26,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from src.frr.models import EvidenceItem  # noqa: E402
+from src.frr.report import horizon_status  # noqa: E402
 from src.frr.scoring import (  # noqa: E402
     NODE_BASE,
     SOURCE_WEIGHTS,
@@ -77,6 +79,12 @@ as_of = str(ranked[0].get("as_of", "?"))
 high = [r for r in ranked if str(r["risk_band"]) == "high"]
 
 st.subheader(f"{slice_name} — as of {as_of}")
+historical = sum(horizon_status(row, date.today()) == "historical" for row in ranked)
+if historical:
+    st.warning(
+        f"{historical}/{len(ranked)} screen row(s) are historical: their forecast window has elapsed. "
+        "Fixture rubric values are not calibrated live forecasts."
+    )
 
 c1, c2, c3 = st.columns(3)
 c1.metric("nodes scored", len(ranked))
