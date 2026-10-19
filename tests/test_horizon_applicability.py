@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from src.frr.cli import screen_as_of
 from src.frr.report import horizon_status, render_summary
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,3 +69,16 @@ def test_show_rejects_malformed_evaluation_date(value):
     result = _show("--evaluated-on", value)
     assert result.returncode == 2
     assert "expected YYYY-MM-DD" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "month, expected",
+    [
+        ("2026-06", "2026-06-30"),
+        ("2026-07", "2026-07-30"),
+        ("2026-02", "2026-02-28"),
+        ("2028-02", "2028-02-29"),
+    ],
+)
+def test_screen_as_of_is_a_real_date(month, expected):
+    assert screen_as_of(month) == expected

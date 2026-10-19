@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import calendar
 import json
 import re
 import sys
@@ -16,6 +17,13 @@ from .validation import read_jsonl, validate_traceability
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def screen_as_of(month: str) -> str:
+    """Anchor a month's screen on its 30th, or its last day if the month is shorter."""
+    year, month_number = (int(part) for part in month.split("-"))
+    day = min(30, calendar.monthrange(year, month_number)[1])
+    return date(year, month_number, day).isoformat()
+
+
 def build_report(month: str, slice_name: str) -> tuple[Path, Path]:
     graph = load_graph(ROOT / "data" / "chip_graph_export.json")
     # Validate the slice before touching the filesystem so an unsupported
@@ -28,7 +36,7 @@ def build_report(month: str, slice_name: str) -> tuple[Path, Path]:
             f"(expected {evidence_csv.relative_to(ROOT).as_posix()})"
         )
     evidence = load_evidence(evidence_csv)
-    scores = score_nodes(nodes, evidence_by_node(evidence), f"{month}-30")
+    scores = score_nodes(nodes, evidence_by_node(evidence), screen_as_of(month))
     score_path = ROOT / "data" / "scores" / slice_name / f"{month}.jsonl"
     evidence_path = ROOT / "data" / "evidence" / f"{month}-{slice_name}.jsonl"
     report_path = ROOT / "reports" / f"{month}-{slice_name}.md"
