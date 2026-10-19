@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 from .evidence import evidence_by_node, load_evidence
@@ -45,7 +46,11 @@ def validate_reports() -> None:
         validate_traceability(score_path, evidence_path)
 
 
-def show_summary(slice_name: str = "substrate-osat", month: str = "2026-06") -> str:
+def show_summary(
+    slice_name: str = "substrate-osat",
+    month: str = "2026-06",
+    evaluated_on: date | None = None,
+) -> str:
     score_path = ROOT / "data" / "scores" / slice_name / f"{month}.jsonl"
     evidence_path = ROOT / "data" / "evidence" / f"{month}-{slice_name}.jsonl"
     if not score_path.exists():
@@ -55,7 +60,14 @@ def show_summary(slice_name: str = "substrate-osat", month: str = "2026-06") -> 
         )
     scores = read_jsonl(score_path)
     evidence = read_jsonl(evidence_path)
-    return render_summary(scores, evidence)
+    return render_summary(scores, evidence, evaluated_on=evaluated_on)
+
+
+def _iso_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected YYYY-MM-DD, got {value!r}") from None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -68,10 +80,17 @@ def main(argv: list[str] | None = None) -> int:
     show = sub.add_parser("show", help="print the committed ranked disruption screen")
     show.add_argument("--slice", default="substrate-osat")
     show.add_argument("--month", default="2026-06")
+    show.add_argument(
+        "--evaluated-on",
+        type=_iso_date,
+        default=None,
+        metavar="YYYY-MM-DD",
+        help="date to judge horizon applicability on (default: today)",
+    )
     args = parser.parse_args(argv)
     try:
         if args.command == "show":
-            print(show_summary(args.slice, args.month))
+            print(show_summary(args.slice, args.month, args.evaluated_on))
             return 0
         if args.command == "score":
             score_path, report_path = build_report(args.month, args.slice)

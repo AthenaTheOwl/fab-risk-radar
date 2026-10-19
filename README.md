@@ -40,7 +40,8 @@ top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption pr
   anchored on filing: https://www.ibiden.com/ir/library/
 ```
 
-The applicability line uses the date you run it on.
+The applicability line uses the date you run it on; add `--evaluated-on 2026-10-19` to
+reproduce the output above exactly.
 
 It tells a procurement lead which substrate/OSAT node to chase first this quarter,
 ranked, with each score backed by three public evidence items.
@@ -66,6 +67,7 @@ branch `main`, main file `streamlit_app.py`.
 
 ```powershell
 python frr.py show                                  # ranked screen from committed data
+python frr.py show --evaluated-on 2026-10-19        # same, applicability judged on a fixed date
 python frr.py score --slice substrate-osat --month 2026-06   # rebuild scores + report
 python frr.py validate                              # check score-to-evidence traceability
 ```
