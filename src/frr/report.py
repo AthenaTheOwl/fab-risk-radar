@@ -47,8 +47,10 @@ def render_summary(
     lines = [
         f"FabRiskRADAR - {slice_name} - 90-day disruption screen (as of {as_of})",
         f"{len(ranked)} nodes scored, {len(high)} in the high band. "
-        "Scores describe the window anchored at as_of; fixture rubric values are not calibrated live forecasts.",
-        f"Applicability on {evaluated_on}: {historical}/{len(ranked)} row(s) historical (horizon elapsed).",
+        "Scores describe the window anchored at as_of; "
+        "fixture rubric values are not calibrated live forecasts.",
+        f"Applicability on {evaluated_on}: {historical}/{len(ranked)} row(s) historical "
+        "(horizon elapsed).",
         "",
         f"  {'rank':<4} {'prob':>6}  {'band':<6} node",
         f"  {'-' * 4} {'-' * 6}  {'-' * 6} {'-' * 40}",

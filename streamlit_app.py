@@ -11,8 +11,8 @@ branch main, main file streamlit_app.py.
 from __future__ import annotations
 
 import json
-from datetime import date
 import sys
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -83,7 +83,8 @@ evaluated_on = date.today()
 historical = sum(horizon_status(row, evaluated_on) == "historical" for row in ranked)
 if historical:
     st.warning(
-        f"{historical}/{len(ranked)} screen row(s) are historical: their forecast window has elapsed. "
+        f"{historical}/{len(ranked)} screen row(s) are historical: "
+        "their forecast window has elapsed. "
         "Fixture rubric values are not calibrated live forecasts."
     )
 

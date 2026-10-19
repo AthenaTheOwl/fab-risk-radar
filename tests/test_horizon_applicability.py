@@ -19,7 +19,16 @@ def test_window_boundary_is_exclusive_and_preserves_historical_value():
 
 
 def test_elapsed_screen_is_labeled_in_readable_output():
-    row = {"as_of": "2026-06-30", "horizon_days": 90, "disruption_probability_90d": 0.5, "slice": "synthetic", "risk_band": "watch", "node_name": "synthetic", "region": "test", "evidence_ids": ["e"]}
+    row = {
+        "as_of": "2026-06-30",
+        "horizon_days": 90,
+        "disruption_probability_90d": 0.5,
+        "slice": "synthetic",
+        "risk_band": "watch",
+        "node_name": "synthetic",
+        "region": "test",
+        "evidence_ids": ["e"],
+    }
     output = render_summary([row], [], evaluated_on=date(2026, 10, 18))
     assert "1/1 row(s) historical" in output
     assert "not calibrated live forecasts" in output
