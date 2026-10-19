@@ -1,8 +1,10 @@
 # fab-risk-radar
 
-A single substrate cluster in Ogaki, Japan carries a 58% chance of disrupting supply
-in the next 90 days. Three other names sit behind it. fab-risk-radar publishes the
-list, ranked, with the public filing behind each number.
+As of 2026-06-30, the screen scored a single substrate cluster in Ogaki, Japan at a 58%
+chance of disrupting supply in the following 90 days. Three other names sat behind it.
+That window elapsed on 2026-09-28, so the number is now a historical record, not a live
+forecast. fab-risk-radar publishes the list, ranked, with the public filing behind each
+number.
 
 ## What it does
 
