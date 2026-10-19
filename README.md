@@ -108,3 +108,7 @@ fab-risk-radar/
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Method update
+
+[October method update: An elapsed forecast window becomes history](docs/forecast-applicability.md).
