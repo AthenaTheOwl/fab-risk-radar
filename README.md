@@ -25,7 +25,8 @@ No args, read-only, offline. Prints the committed 2026-06 ranked screen:
 ```
 $ python frr.py show
 FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
-3 nodes scored, 2 in the high band. Higher probability = more likely to constrain capacity in the next 90 days.
+3 nodes scored, 2 in the high band. Scores describe the window anchored at as_of; fixture rubric values are not calibrated live forecasts.
+Applicability on 2026-10-19: 3/3 row(s) historical (horizon elapsed).
 
   rank   prob  band   node
   ---- ------  ------ ----------------------------------------
@@ -36,6 +37,8 @@ FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
 top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption probability
   anchored on filing: https://www.ibiden.com/ir/library/
 ```
+
+The applicability line uses the date you run it on.
 
 It tells a procurement lead which substrate/OSAT node to chase first this quarter,
 ranked, with each score backed by three public evidence items.
