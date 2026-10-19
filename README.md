@@ -43,8 +43,8 @@ top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption pr
 The applicability line uses the date you run it on; add `--evaluated-on 2026-10-19` to
 reproduce the output above exactly.
 
-It tells a procurement lead which substrate/OSAT node to chase first this quarter,
-ranked, with each score backed by three public evidence items.
+Each screen tells a procurement lead which substrate/OSAT node to chase first during
+its 90-day window, ranked, with each score backed by three public evidence items.
 
 ## Live demo
 
