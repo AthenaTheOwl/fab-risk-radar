@@ -2,7 +2,7 @@
 
 Method update: October 18, 2026. Proposed experiments below are not reported as executed results.
 
-The screen stores `as_of` and `horizon_days`. The readable CLI and Streamlit view now identify rows whose window has elapsed. The original score remains unchanged: an old forecast is evidence of what the rubric said then, rather than an estimate for the next ninety days today.
+The screen stores `as_of` and `horizon_days`. The readable CLI and Streamlit view now count rows whose window has elapsed. The original score remains unchanged: an old forecast is evidence of what the rubric said on its as-of date.
 
 The boundary is explicit: a window beginning on its as-of date is historical on as-of plus horizon days. Evaluating the June fixture in October therefore requires an applicability label, even if every source URL remains reachable. URL availability, evidence freshness, horizon applicability and measured calibration answer different questions.
 
