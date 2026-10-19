@@ -108,10 +108,10 @@ fab-risk-radar/
   decisions/            # DEC-FRR-* architectural choices
 ```
 
-## License
-
-MIT. See [LICENSE](LICENSE).
-
 ## Method update
 
 [October method update: An elapsed forecast window becomes history](docs/forecast-applicability.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
