@@ -100,11 +100,9 @@ fab-risk-radar/
       acceptance.md
   docs/
     first-pr.md
+    forecast-applicability.md
   src/
-    scoring/            # disruption_probability.py
-    evidence/           # substrate_ingest, osat_ingest
-    graph/              # import from chip-supply-chain-map
-    render/             # report template, pdf export
+    frr/                # cli, graph, evidence, scoring, report, validation
   data/
     chip_graph_export.json   # from chip-supply-chain-map
   reports/              # checked-in monthly PDF + markdown
