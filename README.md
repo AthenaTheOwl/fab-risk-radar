@@ -1,8 +1,10 @@
 # fab-risk-radar
 
-A single substrate cluster in Ogaki, Japan carries a 58% chance of disrupting supply
-in the next 90 days. Three other names sit behind it. fab-risk-radar publishes the
-list, ranked, with the public filing behind each number.
+As of 2026-06-30, the screen scored a single substrate cluster in Ogaki, Japan at a 58%
+chance of disrupting supply in the 90-day window starting that day. Two other names sat
+behind it. That window ran through 2026-09-27, so the score is now a dated historical
+record. fab-risk-radar publishes the list, ranked, with the public filing behind each
+number.
 
 ## What it does
 
@@ -25,7 +27,8 @@ No args, read-only, offline. Prints the committed 2026-06 ranked screen:
 ```
 $ python frr.py show
 FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
-3 nodes scored, 2 in the high band. Higher probability = more likely to constrain capacity in the next 90 days.
+3 nodes scored, 2 in the high band. Scores describe the window anchored at as_of; fixture rubric values are not calibrated live forecasts.
+Applicability on 2026-10-19: 3/3 row(s) historical (horizon elapsed).
 
   rank   prob  band   node
   ---- ------  ------ ----------------------------------------
@@ -37,8 +40,11 @@ top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption pr
   anchored on filing: https://www.ibiden.com/ir/library/
 ```
 
-It tells a procurement lead which substrate/OSAT node to chase first this quarter,
-ranked, with each score backed by three public evidence items.
+The applicability line uses the date you run it on; add `--evaluated-on 2026-10-19` to
+reproduce the output above exactly.
+
+Each screen tells a procurement lead which substrate/OSAT node to chase first during
+its 90-day window, ranked, with each score backed by three public evidence items.
 
 ## Live demo
 
@@ -61,6 +67,7 @@ branch `main`, main file `streamlit_app.py`.
 
 ```powershell
 python frr.py show                                  # ranked screen from committed data
+python frr.py show --evaluated-on 2026-10-19        # same, applicability judged on a fixed date
 python frr.py score --slice substrate-osat --month 2026-06   # rebuild scores + report
 python frr.py validate                              # check score-to-evidence traceability
 ```
@@ -93,11 +100,9 @@ fab-risk-radar/
       acceptance.md
   docs/
     first-pr.md
+    forecast-applicability.md
   src/
-    scoring/            # disruption_probability.py
-    evidence/           # substrate_ingest, osat_ingest
-    graph/              # import from chip-supply-chain-map
-    render/             # report template, pdf export
+    frr/                # cli, graph, evidence, scoring, report, validation
   data/
     chip_graph_export.json   # from chip-supply-chain-map
   reports/              # checked-in monthly PDF + markdown
@@ -105,10 +110,10 @@ fab-risk-radar/
   decisions/            # DEC-FRR-* architectural choices
 ```
 
-## License
-
-MIT. See [LICENSE](LICENSE).
-
 ## Method update
 
 [October method update: An elapsed forecast window becomes history](docs/forecast-applicability.md).
+
+## License
+
+MIT. See [LICENSE](LICENSE).

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import calendar
 import json
+import re
 import sys
+from datetime import date
 from pathlib import Path
 
 from .evidence import evidence_by_node, load_evidence
@@ -12,6 +15,13 @@ from .scoring import score_nodes
 from .validation import read_jsonl, validate_traceability
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def screen_as_of(month: str) -> str:
+    """Anchor a month's screen on its 30th, or its last day if the month is shorter."""
+    year, month_number = (int(part) for part in month.split("-"))
+    day = min(30, calendar.monthrange(year, month_number)[1])
+    return date(year, month_number, day).isoformat()
 
 
 def build_report(month: str, slice_name: str) -> tuple[Path, Path]:
@@ -26,7 +36,7 @@ def build_report(month: str, slice_name: str) -> tuple[Path, Path]:
             f"(expected {evidence_csv.relative_to(ROOT).as_posix()})"
         )
     evidence = load_evidence(evidence_csv)
-    scores = score_nodes(nodes, evidence_by_node(evidence), f"{month}-30")
+    scores = score_nodes(nodes, evidence_by_node(evidence), screen_as_of(month))
     score_path = ROOT / "data" / "scores" / slice_name / f"{month}.jsonl"
     evidence_path = ROOT / "data" / "evidence" / f"{month}-{slice_name}.jsonl"
     report_path = ROOT / "reports" / f"{month}-{slice_name}.md"
@@ -45,7 +55,11 @@ def validate_reports() -> None:
         validate_traceability(score_path, evidence_path)
 
 
-def show_summary(slice_name: str = "substrate-osat", month: str = "2026-06") -> str:
+def show_summary(
+    slice_name: str = "substrate-osat",
+    month: str = "2026-06",
+    evaluated_on: date | None = None,
+) -> str:
     score_path = ROOT / "data" / "scores" / slice_name / f"{month}.jsonl"
     evidence_path = ROOT / "data" / "evidence" / f"{month}-{slice_name}.jsonl"
     if not score_path.exists():
@@ -55,7 +69,18 @@ def show_summary(slice_name: str = "substrate-osat", month: str = "2026-06") -> 
         )
     scores = read_jsonl(score_path)
     evidence = read_jsonl(evidence_path)
-    return render_summary(scores, evidence)
+    return render_summary(scores, evidence, evaluated_on=evaluated_on)
+
+
+def _iso_date(value: str) -> date:
+    # date.fromisoformat also takes 20261019 and 2026-W43-1; hold input to the
+    # documented YYYY-MM-DD form.
+    try:
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+            raise ValueError
+        return date.fromisoformat(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected YYYY-MM-DD, got {value!r}") from None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -68,10 +93,17 @@ def main(argv: list[str] | None = None) -> int:
     show = sub.add_parser("show", help="print the committed ranked disruption screen")
     show.add_argument("--slice", default="substrate-osat")
     show.add_argument("--month", default="2026-06")
+    show.add_argument(
+        "--evaluated-on",
+        type=_iso_date,
+        default=None,
+        metavar="YYYY-MM-DD",
+        help="date to judge horizon applicability on (default: today)",
+    )
     args = parser.parse_args(argv)
     try:
         if args.command == "show":
-            print(show_summary(args.slice, args.month))
+            print(show_summary(args.slice, args.month, args.evaluated_on))
             return 0
         if args.command == "score":
             score_path, report_path = build_report(args.month, args.slice)

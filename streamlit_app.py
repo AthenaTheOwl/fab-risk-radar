@@ -11,8 +11,8 @@ branch main, main file streamlit_app.py.
 from __future__ import annotations
 
 import json
-from datetime import date
 import sys
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -79,10 +79,12 @@ as_of = str(ranked[0].get("as_of", "?"))
 high = [r for r in ranked if str(r["risk_band"]) == "high"]
 
 st.subheader(f"{slice_name} — as of {as_of}")
-historical = sum(horizon_status(row, date.today()) == "historical" for row in ranked)
+evaluated_on = date.today()
+historical = sum(horizon_status(row, evaluated_on) == "historical" for row in ranked)
 if historical:
     st.warning(
-        f"{historical}/{len(ranked)} screen row(s) are historical: their forecast window has elapsed. "
+        f"{historical}/{len(ranked)} screen row(s) are historical: "
+        "their forecast window has elapsed. "
         "Fixture rubric values are not calibrated live forecasts."
     )
 
@@ -117,10 +119,14 @@ st.dataframe(
 )
 
 top = ranked[0]
+top_status = horizon_status(top, evaluated_on)
+applicability = (
+    "historical (horizon elapsed)" if top_status == "historical" else top_status.replace("_", " ")
+)
 st.info(
     f"**top risk:** {top['node_name']} ({top['region']}) at "
     f"{float(top['disruption_probability_90d']):.0%} 90-day disruption probability "
-    f"— higher probability = more likely to constrain capacity in the next 90 days."
+    f"for the window anchored at {as_of} — applicability on {evaluated_on}: {applicability}."
 )
 
 with st.expander("evidence for the top-risk node"):
