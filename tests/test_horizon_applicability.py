@@ -1,3 +1,5 @@
+import json
+import shutil
 import subprocess
 import sys
 from datetime import date
@@ -5,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from src.frr import cli
 from src.frr.cli import screen_as_of
 from src.frr.report import horizon_status, render_summary
 
@@ -82,3 +85,17 @@ def test_show_rejects_malformed_evaluation_date(value):
 )
 def test_screen_as_of_is_a_real_date(month, expected):
     assert screen_as_of(month) == expected
+
+
+def test_build_report_writes_a_real_as_of_for_february(tmp_path, monkeypatch):
+    (tmp_path / "data" / "evidence").mkdir(parents=True)
+    shutil.copy(ROOT / "data" / "chip_graph_export.json", tmp_path / "data")
+    shutil.copy(
+        ROOT / "data" / "evidence" / "2026-06-substrate-osat.csv",
+        tmp_path / "data" / "evidence" / "2026-02-substrate-osat.csv",
+    )
+    monkeypatch.setattr(cli, "ROOT", tmp_path)
+    score_path, _ = cli.build_report("2026-02", "substrate-osat")
+    rows = [json.loads(line) for line in score_path.read_text(encoding="utf-8").splitlines()]
+    assert rows
+    assert {row["as_of"] for row in rows} == {"2026-02-28"}
