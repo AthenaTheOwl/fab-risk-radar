@@ -85,16 +85,16 @@ if historical:
     st.warning(
         f"{historical}/{len(ranked)} screen row(s) are historical: "
         "their forecast window has elapsed. "
-        "Fixture rubric values are not calibrated live forecasts."
+        "Rubric scores are not calibrated probabilities."
     )
 
 c1, c2, c3 = st.columns(3)
 c1.metric("nodes scored", len(ranked))
 c2.metric("high band", len(high))
 c3.metric(
-    "top probability",
-    f"{float(ranked[0]['disruption_probability_90d']):.0%}",
-    help="highest 90-day disruption probability in the screen",
+    "top rubric score",
+    f"{float(ranked[0]['disruption_probability_90d']):.2f}",
+    help="highest additive rubric score (0-1) in the screen; not a calibrated probability",
 )
 
 bands = ["all"] + sorted({str(r["risk_band"]) for r in ranked})
@@ -105,7 +105,7 @@ st.dataframe(
     [
         {
             "rank": ranked.index(r) + 1,
-            "probability": round(float(r["disruption_probability_90d"]), 3),
+            "score": round(float(r["disruption_probability_90d"]), 3),
             "band": r.get("risk_band"),
             "node": r.get("node_name"),
             "region": r.get("region"),
@@ -124,9 +124,9 @@ applicability = (
     "historical (horizon elapsed)" if top_status == "historical" else top_status.replace("_", " ")
 )
 st.info(
-    f"**top risk:** {top['node_name']} ({top['region']}) at "
-    f"{float(top['disruption_probability_90d']):.0%} 90-day disruption probability "
-    f"for the window anchored at {as_of} — applicability on {evaluated_on}: {applicability}."
+    f"**top risk:** {top['node_name']} ({top['region']}) at rubric score "
+    f"{float(top['disruption_probability_90d']):.2f} (not a calibrated probability) "
+    f"for the 90-day window anchored at {as_of} — applicability on {evaluated_on}: {applicability}."
 )
 
 with st.expander("evidence for the top-risk node"):
@@ -147,7 +147,8 @@ st.header("score a node yourself")
 st.caption(
     "this drives the real engine — `src/frr/scoring.py:score_node` — not a lookup. "
     "set the node kind, tier, and the public evidence you have; the same function "
-    "the monthly screen uses recomputes the 90-day disruption probability live."
+    "that built the committed screen recomputes the rubric score live. the score "
+    "ranks nodes; it is not a calibrated probability of disruption."
 )
 
 kinds = list(NODE_BASE)
@@ -165,7 +166,7 @@ with ic1:
         min_value=1,
         max_value=4,
         value=2,
-        help="lower tier (closer to 1) adds more probability — bigger upstream chokepoint",
+        help="lower tier (closer to 1) adds more to the score — bigger upstream chokepoint",
     )
 with ic2:
     st.markdown("**evidence you've gathered** (need at least 3; first 5 count)")
@@ -210,8 +211,8 @@ else:
     band_color = {"high": "🔴", "watch": "🟠", "low": "🟢"}.get(row.risk_band, "")
     rc1, rc2 = st.columns(2)
     rc1.metric(
-        "90-day disruption probability",
-        f"{row.disruption_probability_90d:.0%}",
+        "rubric score (0-1)",
+        f"{row.disruption_probability_90d:.2f}",
     )
     rc2.metric("risk band", f"{band_color} {row.risk_band}")
 
@@ -228,7 +229,7 @@ else:
             },
             {"term": f"tier {pick_tier} bonus", "contribution": round(tier_score, 3)},
             {
-                "term": "= probability (min(0.85, sum))",
+                "term": "= score (min(0.85, sum))",
                 "contribution": row.disruption_probability_90d,
             },
         ],

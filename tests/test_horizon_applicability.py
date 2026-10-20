@@ -35,7 +35,19 @@ def test_elapsed_screen_is_labeled_in_readable_output():
     }
     output = render_summary([row], [], evaluated_on=date(2026, 10, 18))
     assert "1/1 row(s) historical" in output
-    assert "not calibrated live forecasts" in output
+    assert "not calibrated probabilities" in output
+
+
+def test_show_reports_a_rubric_score_not_a_percent_chance():
+    result = _show("--evaluated-on", "2026-10-19")
+    assert result.returncode == 0, result.stderr
+    assert "  rank  score  band   node" in result.stdout
+    assert (
+        "top risk: Ibiden Ogaki ABF substrate cluster (Japan) at rubric score 0.58 "
+        "for the 90-day window from 2026-06-30\n"
+    ) in result.stdout
+    assert "%" not in result.stdout
+    assert "disruption probability" not in result.stdout
 
 
 @pytest.mark.parametrize("horizon", [0, -1, True, 90.5, "90", float("nan")])

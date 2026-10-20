@@ -55,11 +55,11 @@ def render_summary(
     lines = [
         f"FabRiskRADAR - {slice_name} - 90-day disruption screen (as of {as_of})",
         f"{len(ranked)} nodes scored, {len(high)} in the high band. "
-        "Scores describe the window anchored at as_of; "
-        "fixture rubric values are not calibrated live forecasts.",
+        "Scores are additive rubric scores (0-1) for the window anchored at as_of; "
+        "they are not calibrated probabilities.",
         f"{applicability}.",
         "",
-        f"  {'rank':<4} {'prob':>6}  {'band':<6} node",
+        f"  {'rank':<4} {'score':>6}  {'band':<6} node",
         f"  {'-' * 4} {'-' * 6}  {'-' * 6} {'-' * 40}",
     ]
     for index, row in enumerate(ranked, start=1):
@@ -74,8 +74,9 @@ def render_summary(
         first_id = list(top["evidence_ids"])[0]
         anchor = evidence_by_id.get(str(first_id))
         lines.append("")
-        lines.append(f"top risk: {top['node_name']} ({top['region']}) at "
-                     f"{float(top['disruption_probability_90d']):.0%} 90-day disruption probability")
+        lines.append(f"top risk: {top['node_name']} ({top['region']}) at rubric score "
+                     f"{float(top['disruption_probability_90d']):.2f} for the "
+                     f"{top['horizon_days']}-day window from {top['as_of']}")
         if anchor is not None:
             lines.append(f"  anchored on {anchor['source_kind']}: {anchor['source_url']}")
 
@@ -99,7 +100,7 @@ def render_markdown(path: Path, scores: list[ScoreRow], evidence: list[EvidenceI
             [
                 f"### {index}. {row.node_name} ({row.region})",
                 "",
-                f"- probability: {row.disruption_probability_90d:.3f}",
+                f"- rubric score: {row.disruption_probability_90d:.3f}",
                 f"- band: {row.risk_band}",
                 f"- node kind: {row.node_kind}",
                 "- evidence:",
@@ -114,7 +115,9 @@ def render_markdown(path: Path, scores: list[ScoreRow], evidence: list[EvidenceI
             "## methodology",
             "",
             "The v0.1 rubric combines node type, tier, and evidence-source mix. "
-            "It is a deterministic screening score, not a forecast model.",
+            "It is a deterministic screening score, not a forecast model. "
+            "Each score is a sum of fixed weights capped at 0.85, so it ranks nodes "
+            "but is not a calibrated probability; no calibration backtest exists yet.",
             "",
             "- schema: `schemas/disruption-score.schema.json`",
             "- evidence schema: `schemas/evidence-item.schema.json`",
