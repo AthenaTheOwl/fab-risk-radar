@@ -7,12 +7,13 @@ recognizes the shape.
 
 ## What this repo is
 
-A monthly publication. The artifact is the checked-in report under
-`reports/YYYY-MM-<slice>.md` plus the PDF render and the underlying
-score parquet. The first slice is substrate plus advanced-packaging
-OSAT. The graph itself lives in `chip-supply-chain-map`; this repo
-imports an export of that graph and computes disruption probabilities
-on top.
+A dated screen, designed to repeat monthly. No scheduled job runs it;
+one screen (2026-06) is committed. The artifact is the checked-in
+report under `reports/YYYY-MM-<slice>.md` plus the underlying score
+JSONL. The first slice is substrate plus advanced-packaging OSAT. The
+graph itself lives in `chip-supply-chain-map`; this repo imports an
+export of that graph and computes additive rubric scores on top. The
+scores are not calibrated probabilities until the backtest below lands.
 
 ## Voice constraints
 
@@ -36,7 +37,8 @@ Will land in spec `0002-substrate-osat`. The intended chain:
 
 ## Out of scope
 
-- Live dashboard. Monthly cadence only.
+- Live dashboard. Screens are dated batch runs; the Streamlit view
+  reads the committed ones.
 - Tier-1 coverage — Resilinc and Everstream already do that well.
   This repo lives below tier-1.
 - Channel checks under NDA. Public sources only.

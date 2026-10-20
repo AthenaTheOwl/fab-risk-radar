@@ -1,10 +1,12 @@
 # fab-risk-radar
 
-As of 2026-06-30, the screen scored a single substrate cluster in Ogaki, Japan at a 58%
-chance of disrupting supply in the 90-day window starting that day. Two other names sat
-behind it. That window ran through 2026-09-27, so the score is now a dated historical
-record. fab-risk-radar publishes the list, ranked, with the public filing behind each
-number.
+As of 2026-06-30, the screen ranked a substrate cluster in Ogaki, Japan first of three
+nodes, at a rubric score of 0.58 for the 90-day window starting that day. Two other names
+sat behind it. The 0.58 is a sum of fixed weights for node kind, tier and evidence mix,
+so it is a ranking score and not a 58% chance of anything; no backtest has calibrated
+it against real disruptions. That window ran through 2026-09-27, so the score is now a
+dated historical record. fab-risk-radar publishes the list, ranked, with the public
+filing behind each number.
 
 ## What it does
 
@@ -14,11 +16,12 @@ that dark. After CoWoS, the next squeeze is Ajinomoto ABF substrate and the adva
 packaging OSATs, and the questions about Taiwan and Korea trade scenarios get answered
 with a shrug because nobody publishes the graph.
 
-fab-risk-radar publishes the graph. Each month it scores the top tier-2/3 nodes by
-how likely they are to disrupt supply in the next 90 days, bands them high/watch, and
-hangs three public evidence items off every score so the number is something you can
-check instead of trust. The first issue covers ABF substrate plus advanced-packaging
-OSATs.
+fab-risk-radar publishes the graph. A screen scores tier-2/3 nodes with a fixed
+rubric for a 90-day window, bands them high/watch, and hangs three public evidence
+items off every score so the number is something you can check instead of trust. The
+design calls for a monthly screen, but nothing schedules one: a screen exists when
+someone adds a month's evidence file and runs `frr.py score`. That has happened once,
+for 2026-06, covering ABF substrate plus advanced-packaging OSATs.
 
 ## Try it
 
@@ -27,16 +30,16 @@ No args, read-only, offline. Prints the committed 2026-06 ranked screen:
 ```
 $ python frr.py show
 FabRiskRADAR - substrate-osat - 90-day disruption screen (as of 2026-06-30)
-3 nodes scored, 2 in the high band. Scores describe the window anchored at as_of; fixture rubric values are not calibrated live forecasts.
+3 nodes scored, 2 in the high band. Scores are additive rubric scores (0-1) for the window anchored at as_of; they are not calibrated probabilities.
 Applicability on 2026-10-19: 3/3 row(s) historical (horizon elapsed).
 
-  rank   prob  band   node
+  rank  score  band   node
   ---- ------  ------ ----------------------------------------
   1     0.580  high   Ibiden Ogaki ABF substrate cluster (Japan)
   2     0.550  high   Unimicron Taoyuan substrate cluster (Taiwan)
   3     0.510  watch  ASE Kaohsiung advanced packaging (Taiwan)
 
-top risk: Ibiden Ogaki ABF substrate cluster (Japan) at 58% 90-day disruption probability
+top risk: Ibiden Ogaki ABF substrate cluster (Japan) at rubric score 0.58 for the 90-day window from 2026-06-30
   anchored on filing: https://www.ibiden.com/ir/library/
 ```
 
@@ -105,8 +108,7 @@ fab-risk-radar/
     frr/                # cli, graph, evidence, scoring, report, validation
   data/
     chip_graph_export.json   # from chip-supply-chain-map
-  reports/              # checked-in monthly PDF + markdown
-  eval/                 # score_calibration.py, Brier backtest
+  reports/              # checked-in markdown report per screen
   decisions/            # DEC-FRR-* architectural choices
 ```
 
