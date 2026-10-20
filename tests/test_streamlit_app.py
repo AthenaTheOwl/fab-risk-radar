@@ -39,5 +39,8 @@ def test_top_risk_box_carries_applicability_label(monkeypatch, today, label):
     assert not at.exception
     box = at.info[0].value
     assert "next 90 days" not in box
+    assert "%" not in box
+    assert f"rubric score {float(TOP['disruption_probability_90d']):.2f}" in box
+    assert "not a calibrated probability" in box
     assert f"window anchored at {TOP['as_of']}" in box
     assert f"applicability on {today.isoformat()}: {label}." in box

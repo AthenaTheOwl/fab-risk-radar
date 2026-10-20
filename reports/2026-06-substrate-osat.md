@@ -7,7 +7,7 @@ Scores are fixture-backed in v0.1 and require three public evidence items per no
 
 ### 1. Ibiden Ogaki ABF substrate cluster (Japan)
 
-- probability: 0.580
+- rubric score: 0.580
 - band: high
 - node kind: abf-substrate
 - evidence:
@@ -17,7 +17,7 @@ Scores are fixture-backed in v0.1 and require three public evidence items per no
 
 ### 2. Unimicron Taoyuan substrate cluster (Taiwan)
 
-- probability: 0.550
+- rubric score: 0.550
 - band: high
 - node kind: abf-substrate
 - evidence:
@@ -27,7 +27,7 @@ Scores are fixture-backed in v0.1 and require three public evidence items per no
 
 ### 3. ASE Kaohsiung advanced packaging (Taiwan)
 
-- probability: 0.510
+- rubric score: 0.510
 - band: watch
 - node kind: advanced-packaging-osat
 - evidence:
@@ -37,7 +37,7 @@ Scores are fixture-backed in v0.1 and require three public evidence items per no
 
 ## methodology
 
-The v0.1 rubric combines node type, tier, and evidence-source mix. It is a deterministic screening score, not a forecast model.
+The v0.1 rubric combines node type, tier, and evidence-source mix. It is a deterministic screening score, not a forecast model. Each score is a sum of fixed weights capped at 0.85, so it ranks nodes but is not a calibrated probability; no calibration backtest exists yet.
 
 - schema: `schemas/disruption-score.schema.json`
 - evidence schema: `schemas/evidence-item.schema.json`
